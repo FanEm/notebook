@@ -1,3 +1,20 @@
+<?php // Do not put any HTML above this line
+
+// Check to see if we have some POST data, if we do process it
+if ( isset($_POST['login']) && isset($_POST['password']) ) {
+    if ( strlen($_POST['login']) < 1 || strlen($_POST['password']) < 1 ) {
+        $failure = "User name and password are required";
+    } else {
+        $check = strlen($_POST['login']) === 'test' && isset($_POST['password']) === 'test';
+        if ( $check) {
+            // Redirect the browser to add.php
+            header("Location: index.html);
+            return;
+        } else {
+            $failure = "Incorrect password";
+        }
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
