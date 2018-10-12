@@ -1,20 +1,28 @@
-<?php // Do not put any HTML above this line
-
+<?php
+session_start();
+if (isset($_POST['cancel'])) {
+    header('Location: login.php');
+    return;
+}
+$salt = 'XyZzy12*_';
 // Check to see if we have some POST data, if we do process it
-if ( isset($_POST['login']) && isset($_POST['password']) ) {
-    if ( strlen($_POST['login']) < 1 || strlen($_POST['password']) < 1 ) {
+if ( isset($_POST['email']) && isset($_POST['password']) ) {
+    if (strlen($_POST['email']) < 1 || strlen($_POST['password']) < 1) {
         $failure = "User name and password are required";
     } else {
-        $check = strlen($_POST['login']) === 'test' && isset($_POST['password']) === 'test';
-        if ( $check) {
-            // Redirect the browser to add.php
-            header("Location: index.html);
+        $check = $_POST['email'] === 'test' && $_POST['password'] === 'test';
+        if ($check) {
+            // Redirect the browser to index.php
+            $_SESSION['email'] = htmlentities($_POST['email']);
+            header("Location: index.php");
             return;
         } else {
-            $failure = "Incorrect password";
+            $_SESSION['error'] = "Incorrect password";
         }
     }
 }
+// Fall through into the View
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +36,7 @@ if ( isset($_POST['login']) && isset($_POST['password']) ) {
 
     <p>
         <label for="login">Логин:</label>
-        <input type="text" name="login" id="login" value="">
+        <input type="text" name="email" id="login" value="">
     </p>
 
     <p>

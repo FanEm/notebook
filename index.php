@@ -1,3 +1,8 @@
+<?php
+session_start();
+require_once "helper.php";
+isLogin();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
