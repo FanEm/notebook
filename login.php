@@ -4,51 +4,60 @@ if (isset($_POST['cancel'])) {
     header('Location: login.php');
     return;
 }
-$salt = 'XyZzy12*_';
-// Check to see if we have some POST data, if we do process it
-if ( isset($_POST['email']) && isset($_POST['password']) ) {
-    if (strlen($_POST['email']) < 1 || strlen($_POST['password']) < 1) {
-        $failure = "User name and password are required";
+
+# Соединямся с БД
+$link = mysqli_connect('localhost','root', 'root', 'Notebook', 8889, "/Applications/MAMP/tmp/mysql/mysql.sock");
+if (mysqli_connect_errno()) {
+    printf("Соединение не удалось: %s\n", mysqli_connect_error());
+    exit();
+}
+
+if(isset($_POST['submit'])) {
+    # Вытаскиваем из БД запись, у которой логин равняеться введенному
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+    $query = "SELECT user_id, password FROM users WHERE email='".($_POST['email'])."' LIMIT 1";
+
+    $query = mysqli_query($link, $query);
+    $data = mysqli_fetch_assoc($query);
+
+    # Соавниваем пароли
+    if($data['password'] === md5(md5($password)) && $data['email'] === $email) {
+        $_SESSION['email'] = htmlentities($email);
+        header("Location: index.php");
+        return;
     } else {
-        $check = $_POST['email'] === 'test' && $_POST['password'] === 'test';
-        if ($check) {
-            // Redirect the browser to index.php
-            $_SESSION['email'] = htmlentities($_POST['email']);
-            header("Location: index.php");
-            return;
-        } else {
-            $_SESSION['error'] = "Incorrect password";
-        }
+        $_SESSION['error'] = "Incorrect password";
     }
 }
-// Fall through into the View
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Registration</title>
+    <title>Authorization</title>
     <link rel="stylesheet" type="text/css" href="login.css" >
 </head>
 <body>
-<form method="post" action="" class="login">
-    <p class="title">Notebook</p>
+<div class="title">Notebook</div>
+<form method="post" action="" class="form">
+    <div class="form__field">
+        <input type="email" name="email" id="email" placeholder="Email" required />
+        <span class="form__error"> This field must contain a valid email address (for example example@site.com)</span>
+    </div>
 
-    <p>
-        <label for="login">Логин:</label>
-        <input type="text" name="email" id="login" value="">
-    </p>
+    <div class="form__field">
+        <input type="password" name="password" id="password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" placeholder="Password" required />
+        <span class="form__error">Must contain at least one number and one uppercase and lowercase letter, and at least 8 characters</span>
 
-    <p>
-        <label for="password">Пароль:</label>
-        <input type="password" name="password" id="password" value="">
-    </p>
+    </div>
 
-    <p class="login-submit">
-        <button type="submit" class="login-button">Войти</button>
-    </p>
+    <button type="submit" class="login-button">Sign in</button>
 
-    <p class="forgot-password"><a href="index.html">Забыл пароль?</a></p>
+    <div class="forgot-password">
+        <a href="..">Forgot password?</a>
+    </div>
 </form>
 </body>
 </html>
